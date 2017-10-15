@@ -2,6 +2,9 @@
   "name": "abv-agent",
   "version": "0.0.1",
   "description": "Abvos browser agent",
+  "engines": {
+    "node": ">=6.11.3"
+  },
   "main": "index.js",
   "scripts": {
     "test": "node agent.js",
@@ -9,8 +12,8 @@
     "dev": "browserify index.js -o dist/tmp.js && uglifyjs dist/tmp.js abv.js -b -m -o dist/abv-agent.0.0.1.js"
   },
   "dependencies": {
-    "abv-ts": "0.0.1",
-    "abv-core": "0.0.1",
+    "abv-ts": "tondy67/abv-ts",
+    "abv-core": "tondy67/abv-core",
     "jszip": "^3.1.3",
     "ws": "^3.2.0"
   },
