@@ -10,15 +10,20 @@ const crypto = require('crypto');
 const JSZip = require("jszip");
 const zip = new JSZip();
 const abv = require('abv-core');
+const fs = require('abv-vfs');
+const pjson = require('./package.json');
 
 const core = {
-		Agent: abv.core.Agent,
+		Agent: abv.core.Agent
 	};
 	
-if (ts.isBrowser()){
-	window.ts = ts;
-	window.zip = zip;
-	window.abv = {core: core};
+if (ts.isBrowser){
+	if (!window.ts) window.ts = ts;
+	if (!window.zip) window.zip = zip;
+	if (window.abv) window.abv.core = core;
+	else window.abv = {core: core};
+	window.abv.fs = fs;
+	window.abv.pjson = pjson;
 }
 
 module.exports = core;
