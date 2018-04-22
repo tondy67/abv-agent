@@ -4,11 +4,11 @@
  */
 "use strict";
 
-const ts = require('abv-ts')('abv:console');
+const ts = require('abv-ts')('abv:agent');
 const pjson = require('./package.json');
 const fs = require('abv-vfs');
 const readline = require('readline');
-const abv = require('abv-core');
+const { CAgent } = require('abv-core');
 const WebSocket = require('ws');
 const net = require('net');
 
@@ -55,7 +55,7 @@ const getLine = () => {
 				agent.call('online','','');
 			}else if (answer == 'e'){
 				const now = Date.now();
-				agent.call('echo','What time?','@1',1).then(
+				agent.call('echo','What time?','@1',1000).then(
 					res => { agent.log(59,res,Date.now()-now); },
 					err => { ts.error(60,err); });
 			}else if (answer == 'f'){
@@ -80,7 +80,7 @@ const getLine = () => {
 
 };
 
-const agent = new abv.core.Agent(host,WebSocket); // net.Socket
+const agent = new CAgent(host,WebSocket); // net.Socket
 agent.out = out;
 agent.log = ts.debug.bind(ts);
 agent.file = (msg) => {

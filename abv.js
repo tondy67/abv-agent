@@ -8,6 +8,8 @@
 (() => {
 	/** @typedef */
 	const fs = abv.fs;
+	const CAgent = abv.CAgent;
+	
 	const select = document.querySelector.bind(document);
 
 	const messages = select('#messages'),
@@ -74,7 +76,7 @@
 		boxFile.value = '';
 	});
 	
-  	const agent = new abv.core.Agent(location.origin,WebSocket);
+  	const agent = new CAgent(location.origin,WebSocket);
 
   	agent.file = (msg) => { 
 			let br = document.createElement("br");
