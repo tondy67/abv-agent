@@ -5,15 +5,17 @@
 "use strict";
 
 const ts = require('abv-ts')('abv:agent');
-const pjson = require('./package.json');
+const pjson = require('../package.json');
 const fs = require('abv-vfs');
 const readline = require('readline');
-const { CAgent } = require('abv-core');
+const CAgent = require('../lib/CAgent.js');
 const WebSocket = require('ws');
 const net = require('net');
+const os = require('os');
 
 const host = 'http://localhost:8080';
 const icon = 'favicon-32x32.png';
+const bdir = os.tmpdir();
 
 let hist = [];
 let rl = null;
@@ -59,7 +61,7 @@ const getLine = () => {
 					res => { agent.log(59,res,Date.now()-now); },
 					err => { ts.error(60,err); });
 			}else if (answer == 'f'){
-				const file =  'abvos.png';//'Vídeo.MOV';//'BrianBoru.mp4';//'green-camp.jpg'; // 
+				const file =  __dirname+'/abvos.png';//'Vídeo.MOV';//'BrianBoru.mp4';//'green-camp.jpg'; // 
 				if (fs.existsSync(file)){
 					const stat = fs.lstatSync(file); 
 					const mime = fs.mimetype(file);
@@ -85,7 +87,7 @@ agent.out = out;
 agent.log = ts.debug.bind(ts);
 agent.file = (msg) => {
 	const file = msg.n;
-	fs.writeFileSync(__dirname+'/files/' + file, Buffer.from(msg.b));
+	fs.writeFileSync(bdir+'/' + file, Buffer.from(msg.b));
 	out('> file: ' + file);
 };
 if (pjson.config){

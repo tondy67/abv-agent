@@ -1,18 +1,19 @@
 {
   "name": "abv-agent",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Abvos browser agent",
   "engines": {
     "node": ">=6.11.3"
   },
   "main": "index.js",
   "scripts": {
-    "test": "node agent.js",
-    "dist": "browserify index.js -o dist/tmp.js && uglifyjs dist/tmp.js abv.js -c -m -o dist/abv-agent.0.0.3.js",
-    "dev": "browserify index.js -o dist/tmp.js && uglifyjs dist/tmp.js abv.js -b -m -o dist/abv-agent.0.0.3.js"
+    "test": "node test/agent.js",
+    "dist": "browserify index.js -o dist/tmp.js && uglifyjs dist/tmp.js abv.js -c -m -o dist/abv-agent.0.0.4.js",
+    "dev": "browserify index.js -o dist/tmp.js && uglifyjs dist/tmp.js abv.js -b -m -o dist/abv-agent.0.0.4.js"
   },
   "dependencies": {
-    "abv-core": "0.0.3",
+    "abv-socket": "file:../abv-socket",
+    "abv-core": "file:../abv-core",
     "abv-ts": "0.0.3",
     "abv-vfs": "0.0.3",
     "jszip": "^3.1.5",

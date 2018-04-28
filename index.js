@@ -10,7 +10,7 @@ const ts = require('abv-ts')('abv:agent');
 const crypto = require('crypto');
 const JSZip = require("jszip");
 const zip = new JSZip();
-const {CAgent} = require('abv-core');
+const CAgent = require('./lib/CAgent.js');
 const fs = require('abv-vfs');
 const pjson = require('./package.json');
 
