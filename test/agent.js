@@ -16,13 +16,22 @@ const os = require('os');
 const host = 'http://localhost:8080';
 const icon = 'favicon-32x32.png';
 const bdir = os.tmpdir();
+const $psw = '32bytes-67VC61jmV54rIYu1545x4TlY';
+const $iv = 'tondy';
 
 let hist = [];
 let rl = null;
 
 const out = (msg) => {
 	if (msg.t === '') msg.t = 'all';
-	const s = typeof msg === ts.OBJ ? msg.f.substr(0,5)+' > '+msg.t.substr(0,5)+': '+msg.b : msg;
+	let s;
+	if (typeof msg === ts.OBJ){
+		const f = fs.File();
+		f.unpack(msg.b,$psw,$iv); 
+		s = msg.f.substr(0,5)+' > '+msg.t.substr(0,5) + ': ' + f.body;
+	}else{
+		s = msg;
+	}
 	const m = s; 
 	hist.push(m);
   	print(m);
@@ -61,17 +70,21 @@ const getLine = () => {
 					res => { agent.log(59,res,Date.now()-now); },
 					err => { ts.error(60,err); });
 			}else if (answer == 'f'){
-				const file =  __dirname+'/abvos.png';//'Vídeo.MOV';//'BrianBoru.mp4';//'green-camp.jpg'; // 
+				const name = 'abvos.png';
+				const file =  __dirname+'/'+name;//'Vídeo.MOV';//'BrianBoru.mp4';//'green-camp.jpg'; // 
 				if (fs.existsSync(file)){
 					const stat = fs.lstatSync(file); 
 					const mime = fs.mimetype(file);
-					agent.write(file,null,mime,stat.size,'',(progress)=>{
+					const f = fs.File(name, fs.readFileSync(file));
+					const body = f.pack($psw,$iv);
+					agent.write(file,body,mime,stat.size,'',(progress)=>{
 						ts.debug(67,progress);
 					});
 				}
 			}else{
 				agent.call('online','','');
-				agent.call('msg',answer)
+				const f = fs.File(Date.now(),answer);
+				agent.call('msg', f.pack($psw,$iv))
 					.then( res => { })
 					.catch(e => { ts.error(74, e.stack); });
 			}
@@ -86,8 +99,10 @@ const agent = new CAgent(host,WebSocket); // net.Socket
 agent.out = out;
 agent.log = ts.debug.bind(ts);
 agent.file = (msg) => {
-	const file = msg.n;
-	fs.writeFileSync(bdir+'/' + file, Buffer.from(msg.b));
+	const f = fs.File();
+	f.unpack(msg.b, $psw,$iv);
+	const file = bdir + '/' + f.name;
+	fs.writeFileSync(file, Buffer.from(f.body));
 	out('> file: ' + file);
 };
 if (pjson.config){

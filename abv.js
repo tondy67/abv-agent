@@ -9,6 +9,8 @@
 	/** @typedef */
 	const fs = abv.fs;
 	const CAgent = abv.CAgent;
+const $psw = '32bytes-67VC61jmV54rIYu1545x4TlY';
+const $iv = 'tondy';
 	
 	const select = document.querySelector.bind(document);
 
@@ -17,7 +19,15 @@
 		  boxFile = select('#file');
 
 	const show = (msg) => {//console.log(msg);
-		const s = typeof msg === ts.OBJ ? msg.f.substr(0,5)+'>'+msg.t.substr(0,5)+': '+msg.b : msg;
+		if (msg.t === '') msg.t = 'all';
+		let s;
+		if (typeof msg === ts.OBJ){
+			const f = fs.File();
+			f.unpack(msg.b,$psw,$iv); 
+			s = msg.f.substr(0,5)+' > '+msg.t.substr(0,5) + ': ' + f.body;
+		}else{
+			s = msg;
+		}
 		messages.innerHTML += '<br />' + s;
 		messages.scrollTop = messages.scrollHeight;
 	};
@@ -25,14 +35,14 @@
 	const $progress = (v) => { 
 		select('#progress').style.width = (v * 1.5)+'px';
 	};
-		
+/*		
 	select('#echo').onclick = () => {
 		const now = Date.now();
 		agent.call('echo','What time?','@1',1).then(
 			(res)=>{ agent.log(27,res,Date.now()-now); },
 			(err)=>{ ts.error(28,err); });
 	};
-/*
+
 	select('#join').onclick = () => {
 		agent.call('join', '', 'room1');
 	};
@@ -40,11 +50,11 @@
 	select('#leave').onclick = () => {
 			agent.call('leave', '', 'room1');
 	};
-*/
+
 	select('#online').onclick = () => {
 			agent.call('online','','');
 	};
-
+*/
 	select('#msgform').addEventListener('submit',  (e) => {
 		e.preventDefault();
 		const room = select('#room');
@@ -54,10 +64,11 @@
 			const type = file.type;
 			const reader = new FileReader();
 			reader.onload =  (ev) => {
-				const f = reader.result;
+				const f = fs.File(name, reader.result);
+				const body = f.pack($psw,$iv);
 				const fo = agent.f2o(name,f,type);
-				agent.write(name,f,type,f.byteLength,'',(progress)=>{
-					if (progress === 1) agent.file(fo);
+				agent.write(name,body,type,f.size,'',(progress)=>{
+					if (progress === 1) agent.file({b:body});
 					else $progress(progress);
 				});	
 				$progress(20);			
@@ -68,8 +79,9 @@
 			reader.readAsArrayBuffer(file);
 		}else if (box.value !== '') {
 			agent.call('online','','');
-			agent.call('msg',box.value,'').then(
-				(res)=>{ },	(err)=>{ ts.error(61,err); });
+			const f = fs.File(Date.now(), box.value);
+			agent.call('msg', f.pack($psw,$iv))
+				.then( res => { }, err => { ts.error(61,err); });
 			agent.out('all'+' < '+agent.id +": " + box.value);
 		}
 		box.value = '';
@@ -81,8 +93,10 @@
   	agent.file = (msg) => { 
 			let br = document.createElement("br");
 			messages.appendChild(br);
-			let file = new Uint8Array(msg.b);
-			const type = msg.e;
+	const f = fs.File();
+	f.unpack(msg.b, $psw,$iv);
+			let file = new Uint8Array(f.body);
+			const type = f.type;
 			let blob = new window.Blob([file], {type: type}); // 'image/jpeg'
 			let urlCreator = window.URL || window.webkitURL;
 			let fileUrl = urlCreator.createObjectURL(blob);
@@ -97,7 +111,7 @@
 				let linkText = document.createTextNode(msg.n);
 				a.href = fileUrl;
 				a.target = '_blank';
-				a.download = msg.n;
+				a.download = f.name;
 				a.appendChild(linkText);
 				messages.appendChild(a);
 			}
